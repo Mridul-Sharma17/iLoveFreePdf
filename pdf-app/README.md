@@ -1,73 +1,37 @@
-# React + TypeScript + Vite
+# iLoveFreePdf
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+iLoveFreePdf is a professional-grade, 100% private, local-first PDF suite. It processes all documents directly in your browser using high-performance WebAssembly (WASM), ensuring that your sensitive data never leaves your device.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Organize PDFs:** Merge, Split, and Remove Pages.
+- **Convert to PDF:** Word (DOCX/DOC), PowerPoint (PPT/PPTX), Excel (XLS/XLSX), and Images (JPG/PNG).
+- **Convert from PDF:** Extract pages as high-quality JPG images into a ZIP archive.
+- **Privacy First:** 100% local processing. No backend, no uploads, no databases.
 
-## React Compiler
+## Technology
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Framework:** React + Vite + TypeScript.
+- **Design System:** MiniMax-inspired, premium, and clean UI with vibrant gradient product cards.
+- **Conversion Engine:**
+  - **Office Docs:** Uses `libreoffice-converter` (WASM) running in background Web Workers for desktop-class fidelity.
+  - **Images:** Uses `pdf-lib` for fast image-to-PDF embedding and `pdf.js` for high-resolution PDF rendering.
+- **Deployment:** Optimized for Vercel with automated asset caching for heavy binaries.
 
-## Expanding the ESLint configuration
+## Local Development
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Prerequisites
+- Node.js 18.0.0+
+- `npm`
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Setup
+1. Clone the repository.
+2. Run `npm install`.
+   - *This will automatically run the postinstall script to sync the WASM conversion engine to your `public/` folder.*
+3. Run `npm run dev` to start the development server.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Security & Isolation
+The app uses Cross-Origin Opener Policy (COOP) and Cross-Origin Embedder Policy (COEP) headers to enable `SharedArrayBuffer`, which is required by the LibreOffice WASM engine for multi-threaded performance.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Licensing
+MIT License.

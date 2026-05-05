@@ -8,7 +8,7 @@ async function createTestPdf(pages: number): Promise<File> {
     pdfDoc.addPage([200, 200]);
   }
   const bytes = await pdfDoc.save();
-  return new File([bytes], `test-${pages}pg.pdf`, { type: 'application/pdf' });
+  return new File([bytes as any], `test-${pages}pg.pdf`, { type: 'application/pdf' });
 }
 
 describe('PDF Utilities', () => {

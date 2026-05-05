@@ -56,7 +56,7 @@ export function Split() {
       <h1 className="text-3xl font-semibold mb-2">Split PDF</h1>
       <p className="text-steel mb-8">Extract specific pages from a document.</p>
 
-      <Dropzone onFilesDrop={handleFilesDrop} multiple={false}>
+      <Dropzone onFilesSelect={handleFilesDrop} multiple={false}>
         {!file ? (
           <div className="flex-1 flex flex-col items-center justify-center text-steel pointer-events-none">
             <SplitSquareHorizontal size={64} strokeWidth={1} className="mb-4" />

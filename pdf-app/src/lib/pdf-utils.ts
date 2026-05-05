@@ -102,3 +102,18 @@ export async function getPdfPageCount(file: File): Promise<number> {
   const pdfDoc = await PDFDocument.load(arrayBuffer);
   return pdfDoc.getPageCount();
 }
+
+export async function convertJpgsToPdf(files: File[]): Promise<Blob> {
+  const pdfDoc = await PDFDocument.create();
+  for (const file of files) {
+    const arrayBuffer = await file.arrayBuffer();
+    const image = file.type === 'image/png' 
+      ? await pdfDoc.embedPng(arrayBuffer) 
+      : await pdfDoc.embedJpg(arrayBuffer);
+    
+    const page = pdfDoc.addPage([image.width, image.height]);
+    page.drawImage(image, { x: 0, y: 0, width: image.width, height: image.height });
+  }
+  const pdfBytes = await pdfDoc.save();
+  return new Blob([pdfBytes as any], { type: 'application/pdf' });
+}

@@ -1,30 +1,29 @@
-
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { Home } from './Home';
 import { describe, it, expect } from 'vitest';
 
 describe('Home component', () => {
-  it('renders the select a tool heading and all three tools', () => {
+  it('renders the hero section and tool cards', () => {
     render(
       <MemoryRouter>
         <Home />
       </MemoryRouter>
     );
 
-    expect(screen.getByRole('heading', { level: 1, name: /select a tool/i })).toBeInTheDocument();
+    // Check Hero text
+    expect(screen.getByText(/Every tool you need/i)).toBeInTheDocument();
+    expect(screen.getByText(/to work with PDFs/i)).toBeInTheDocument();
+    expect(screen.getByText(/100% Free, Local, and Private/i)).toBeInTheDocument();
 
-    // Check for the specific tool headings and links
-    expect(screen.getByRole('heading', { level: 2, name: /merge pdfs/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /merge pdfs/i }).getAttribute('href')).toBe('/merge');
-    expect(screen.getByText(/Combine multiple PDF files into a single document/i)).toBeInTheDocument();
+    // Check for some tool headings
+    expect(screen.getByRole('heading', { level: 2, name: /Merge PDF/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: /Word to PDF/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: /PDF to JPG/i })).toBeInTheDocument();
 
-    expect(screen.getByRole('heading', { level: 2, name: /split pdf/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /split pdf/i }).getAttribute('href')).toBe('/split');
-    expect(screen.getByText(/Extract specific pages from a PDF into a new file/i)).toBeInTheDocument();
-
-    expect(screen.getByRole('heading', { level: 2, name: /remove pages/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /remove pages/i }).getAttribute('href')).toBe('/remove');
-    expect(screen.getByText(/Delete specific pages from a PDF document/i)).toBeInTheDocument();
+    // Verify links
+    expect(screen.getByRole('link', { name: /Merge PDF/i }).getAttribute('href')).toBe('/merge');
+    expect(screen.getByRole('link', { name: /Word to PDF/i }).getAttribute('href')).toBe('/word-to-pdf');
+    expect(screen.getByRole('link', { name: /PDF to JPG/i }).getAttribute('href')).toBe('/pdf-to-jpg');
   });
 });

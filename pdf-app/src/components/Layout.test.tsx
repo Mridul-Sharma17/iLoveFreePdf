@@ -17,7 +17,7 @@ describe('Layout component', () => {
     );
 
     // Should have a link to home
-    const homeLink = screen.getByRole('link', { name: /pdf utilities/i });
+    const homeLink = screen.getByRole('link', { name: /iLoveFreePdf/i });
     expect(homeLink).toBeInTheDocument();
     expect(homeLink.getAttribute('href')).toBe('/');
 

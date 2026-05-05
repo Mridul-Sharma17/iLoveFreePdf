@@ -81,7 +81,7 @@ export function Merge() {
       <h1 className="text-3xl font-semibold mb-2">Merge PDFs</h1>
       <p className="text-steel mb-8">Drag and drop multiple PDFs and reorder them before merging.</p>
 
-      <Dropzone onFilesDrop={handleFilesDrop} multiple>
+      <Dropzone onFilesSelect={handleFilesDrop} multiple>
         {files.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center text-steel pointer-events-none">
             <Layers size={64} strokeWidth={1} className="mb-4" />

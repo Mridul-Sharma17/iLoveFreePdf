@@ -1,0 +1,5 @@
+
+.worktrees/
+
+pdf-app/public/wasm/soffice.data
+pdf-app/public/wasm/soffice.wasm

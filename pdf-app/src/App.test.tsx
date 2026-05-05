@@ -10,9 +10,9 @@ describe('App routing', () => {
     render(<App />);
 
     // Should see header from Layout
-    expect(screen.getByRole('link', { name: /pdf utilities/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /iLoveFreePdf/i })).toBeInTheDocument();
     
     // Should see Home screen content
-    expect(screen.getByRole('heading', { level: 1, name: /select a tool/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: /every tool you need/i })).toBeInTheDocument();
   });
 });

@@ -1,12 +1,13 @@
 import React, { useCallback, useState, useRef } from 'react';
 
 interface DropzoneProps {
-  onFilesDrop: (files: File[]) => void;
+  onFilesSelect: (files: File[]) => void;
   multiple?: boolean;
+  accept?: string;
   children: React.ReactNode;
 }
 
-export function Dropzone({ onFilesDrop, multiple = false, children }: DropzoneProps) {
+export function Dropzone({ onFilesSelect, multiple = false, accept = "*", children }: DropzoneProps) {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -22,14 +23,13 @@ export function Dropzone({ onFilesDrop, multiple = false, children }: DropzonePr
 
   const processFiles = useCallback((fileList: FileList | null) => {
     if (!fileList) return;
-    const files = Array.from(fileList).filter(
-      (file) => file.type === 'application/pdf'
-    );
+    const files = Array.from(fileList);
+    // Removed hardcoded PDF filter to allow any file type specified by 'accept' prop
 
     if (files.length > 0) {
-      onFilesDrop(multiple ? files : [files[0]]);
+      onFilesSelect(multiple ? files : [files[0]]);
     }
-  }, [onFilesDrop, multiple]);
+  }, [onFilesSelect, multiple]);
 
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
@@ -53,7 +53,8 @@ export function Dropzone({ onFilesDrop, multiple = false, children }: DropzonePr
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
-      className={`min-h-[60vh] flex flex-col transition-colors duration-300 rounded-xl relative ${
+      onClick={openFilePicker}
+      className={`min-h-[60vh] flex flex-col transition-colors duration-300 rounded-xl relative cursor-pointer ${
         isDragging ? 'bg-success-bg border-2 border-dashed border-ink/20' : 'bg-transparent'
       }`}
     >
@@ -62,7 +63,7 @@ export function Dropzone({ onFilesDrop, multiple = false, children }: DropzonePr
         id="pdf-upload-input"
         ref={fileInputRef}
         onChange={handleFileInputChange}
-        accept="application/pdf"
+        accept={accept}
         multiple={multiple}
         className="hidden"
         data-testid="file-input"
@@ -71,4 +72,3 @@ export function Dropzone({ onFilesDrop, multiple = false, children }: DropzonePr
     </div>
   );
 }
-

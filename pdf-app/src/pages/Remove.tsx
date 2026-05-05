@@ -60,7 +60,7 @@ export function Remove() {
       <h1 className="text-3xl font-semibold mb-2">Remove Pages</h1>
       <p className="text-steel mb-8">Delete specific pages from a document.</p>
 
-      <Dropzone onFilesDrop={handleFilesDrop} multiple={false}>
+      <Dropzone onFilesSelect={handleFilesDrop} multiple={false}>
         {!file ? (
           <div className="flex-1 flex flex-col items-center justify-center text-steel pointer-events-none">
             <FileMinus size={64} strokeWidth={1} className="mb-4" />

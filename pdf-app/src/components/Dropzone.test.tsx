@@ -4,10 +4,10 @@ import { Dropzone } from './Dropzone';
 import { describe, it, expect, vi } from 'vitest';
 
 describe('Dropzone component', () => {
-  it('calls onFilesDrop when valid PDF files are dropped', () => {
-    const onFilesDrop = vi.fn();
+  it('calls onFilesSelect when files are dropped', () => {
+    const onFilesSelect = vi.fn();
     render(
-      <Dropzone onFilesDrop={onFilesDrop} multiple>
+      <Dropzone onFilesSelect={onFilesSelect} multiple>
         <div data-testid="drop-target">Drop here</div>
       </Dropzone>
     );
@@ -24,36 +24,14 @@ describe('Dropzone component', () => {
       }
     });
 
-    expect(onFilesDrop).toHaveBeenCalledTimes(1);
-    expect(onFilesDrop).toHaveBeenCalledWith([file]);
+    expect(onFilesSelect).toHaveBeenCalledTimes(1);
+    expect(onFilesSelect).toHaveBeenCalledWith([file]);
   });
 
-  it('filters out non-PDF files', () => {
-    const onFilesDrop = vi.fn();
+  it('calls onFilesSelect when a file is selected via the input', () => {
+    const onFilesSelect = vi.fn();
     render(
-      <Dropzone onFilesDrop={onFilesDrop} multiple>
-        <div data-testid="drop-target">Drop here</div>
-      </Dropzone>
-    );
-
-    const dropTarget = screen.getByTestId('drop-target').parentElement;
-    const pdfFile = new File(['dummy content'], 'test.pdf', { type: 'application/pdf' });
-    const imageFile = new File(['dummy content'], 'test.png', { type: 'image/png' });
-    
-    fireEvent.drop(dropTarget as HTMLElement, {
-      dataTransfer: {
-        files: [pdfFile, imageFile]
-      }
-    });
-
-    expect(onFilesDrop).toHaveBeenCalledTimes(1);
-    expect(onFilesDrop).toHaveBeenCalledWith([pdfFile]); // Should only contain the PDF
-  });
-
-  it('calls onFilesDrop when a file is selected via the button', () => {
-    const onFilesDrop = vi.fn();
-    render(
-      <Dropzone onFilesDrop={onFilesDrop}>
+      <Dropzone onFilesSelect={onFilesSelect}>
         <div />
       </Dropzone>
     );
@@ -65,7 +43,7 @@ describe('Dropzone component', () => {
       target: { files: [file] }
     });
 
-    expect(onFilesDrop).toHaveBeenCalledTimes(1);
-    expect(onFilesDrop).toHaveBeenCalledWith([file]);
+    expect(onFilesSelect).toHaveBeenCalledTimes(1);
+    expect(onFilesSelect).toHaveBeenCalledWith([file]);
   });
 });

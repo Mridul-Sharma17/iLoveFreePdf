@@ -1,3 +1,23 @@
+# Homepage Redesign Implementation Plan
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+
+**Goal:** Redesign the homepage to match the MiniMax brand identity with a vibrant grid of 8 PDF tools.
+
+**Architecture:** Update `Home.tsx` with a new Hero section and a responsive grid using custom colors and styles. Update `Home.test.tsx` to verify the new content.
+
+**Tech Stack:** React, Tailwind CSS, Lucide React, Vitest, React Testing Library.
+
+---
+
+### Task 1: Update Home.tsx Implementation
+
+**Files:**
+- Modify: `src/pages/Home.tsx`
+
+- [ ] **Step 1: Replace existing Home component implementation**
+
+```tsx
 import { Link } from 'react-router-dom';
 import { 
   Layers, 
@@ -119,3 +139,64 @@ export function Home() {
     </div>
   );
 }
+```
+
+- [ ] **Step 2: Commit changes to Home.tsx**
+
+```bash
+git add src/pages/Home.tsx
+git commit -m "feat: redesign homepage with MiniMax vibrant grid"
+```
+
+---
+
+### Task 2: Update Home.test.tsx
+
+**Files:**
+- Modify: `src/pages/Home.test.tsx`
+
+- [ ] **Step 1: Update Home.test.tsx to match new content**
+
+```tsx
+import { render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
+import { Home } from './Home';
+import { describe, it, expect } from 'vitest';
+
+describe('Home component', () => {
+  it('renders the hero section and tool cards', () => {
+    render(
+      <MemoryRouter>
+        <Home />
+      </MemoryRouter>
+    );
+
+    // Check Hero text
+    expect(screen.getByText(/Every tool you need/i)).toBeInTheDocument();
+    expect(screen.getByText(/to work with PDFs/i)).toBeInTheDocument();
+    expect(screen.getByText(/100% Free, Local, and Private/i)).toBeInTheDocument();
+
+    // Check for some tool headings
+    expect(screen.getByRole('heading', { level: 2, name: /Merge PDF/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: /Word to PDF/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: /PDF to JPG/i })).toBeInTheDocument();
+
+    // Verify links
+    expect(screen.getByRole('link', { name: /Merge PDF/i }).getAttribute('href')).toBe('/merge');
+    expect(screen.getByRole('link', { name: /Word to PDF/i }).getAttribute('href')).toBe('/word-to-pdf');
+    expect(screen.getByRole('link', { name: /PDF to JPG/i }).getAttribute('href')).toBe('/pdf-to-jpg');
+  });
+});
+```
+
+- [ ] **Step 2: Run tests to verify**
+
+Run: `npm test src/pages/Home.test.tsx`
+Expected: PASS
+
+- [ ] **Step 3: Commit test changes**
+
+```bash
+git add src/pages/Home.test.tsx
+git commit -m "test: update homepage tests for redesigned layout"
+```

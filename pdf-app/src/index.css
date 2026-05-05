@@ -1,20 +1,34 @@
 @import "tailwindcss";
 
 @theme {
-  --color-canvas: #ffffff;
-  --color-surface: #f7f8fa;
-  --color-ink: #0a0a0a;
-  --color-hairline: #e5e7eb;
-  --color-steel: #5f5f5f;
+  --color-primary: #0a0a0a;
+  --color-brand-coral: #ff5530;
+  --color-brand-blue: #1456f0;
+  --color-brand-purple: #a855f7;
   --color-success-bg: #e8ffea;
-  
-  --font-family-sans: "DM Sans", "Inter", "sans-serif";
+  --color-success-text: #1ba673;
+  --font-display: 'DM Sans', sans-serif;
 }
 
-@layer base {
-  body {
-    background-color: var(--color-canvas);
-    color: var(--color-ink);
-    font-family: var(--font-family-sans);
-  }
+.hero-text {
+  font-family: var(--font-display);
+  font-size: 80px;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -2px;
+}
+
+.button-primary {
+  @apply bg-primary text-white px-6 py-3 rounded-full font-bold hover:bg-gray-800 transition-colors;
+}
+
+.card-vibrant-coral {
+  @apply bg-brand-coral text-white p-8 rounded-[32px] hover:scale-[1.02] transition-transform cursor-pointer;
+}
+
+/* Ensure DM Sans is applied to body */
+body {
+  font-family: 'DM Sans', sans-serif;
+  background-color: #ffffff;
+  color: #0a0a0a;
 }
