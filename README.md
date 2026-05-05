@@ -3,7 +3,7 @@
 iLoveFreePdf is a professional-grade, 100% private, local-first PDF suite. It processes all documents directly in your browser using high-performance WebAssembly (WASM), ensuring that your sensitive data never leaves your device.
 
 ## 🚀 Live Demo
-[Check it out on Vercel (Coming Soon)](#)
+[https://pdf-app-coral-beta.vercel.app](https://pdf-app-coral-beta.vercel.app)
 
 ## ✨ Features
 
