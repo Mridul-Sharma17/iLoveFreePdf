@@ -1,36 +1,53 @@
 # iLoveFreePdf
 
-A powerful and intuitive PDF manipulation tool built with React and Vite.
+iLoveFreePdf is a professional-grade, 100% private, local-first PDF suite. It processes all documents directly in your browser using high-performance WebAssembly (WASM), ensuring that your sensitive data never leaves your device.
 
-## Features
+## 🚀 Live Demo
+[Check it out on Vercel (Coming Soon)](#)
 
-- **Split PDF**: Easily split large PDF files into smaller documents.
-- **Merge PDF**: Combine multiple PDF files into one.
-- **Remove Pages**: Select and remove specific pages from your PDF documents.
-- **Dropzone Interface**: User-friendly drag-and-drop file upload.
+## ✨ Features
 
-## Tech Stack
+- **Organize PDFs:** Merge, Split, and Remove Pages.
+- **Convert to PDF:** Word (DOCX/DOC), PowerPoint (PPT/PPTX), Excel (XLS/XLSX), and Images (JPG/PNG).
+- **Convert from PDF:** Extract pages as high-quality JPG images into a ZIP archive.
+- **Privacy First:** 100% local processing. No backend, no uploads, no databases.
 
-- **Framework**: React (TypeScript)
-- **Build Tool**: Vite
-- **Styling**: Vanilla CSS
+## 🛠️ Technology Stack
 
-## Setup
+- **Frontend:** React + Vite + TypeScript.
+- **Design System:** MiniMax-inspired, premium, and clean UI with vibrant gradient product cards.
+- **Conversion Engines:**
+  - **Office Docs:** Uses `@matbee/libreoffice-converter` (WASM) running in background Web Workers for desktop-class fidelity.
+  - **Images:** Uses `pdf-lib` for fast image-to-PDF embedding and `pdf.js` for high-resolution PDF rendering.
+- **Asset Performance:** Optimized for Vercel with automated asset caching for heavy binaries.
 
-1. **Install dependencies**:
+## 💻 Local Development
+
+### Prerequisites
+- Node.js 18.0.0+
+- `npm`
+
+### Setup Instructions
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/Mridul-Sharma17/iLoveFreePdf.git
+   cd iLoveFreePdf
+   ```
+2. **Install dependencies:**
    ```bash
    cd pdf-app
    npm install
    ```
-2. **Run in development**:
+   *Note: This will automatically run the postinstall script to sync the WASM conversion engine to your `public/` folder.*
+3. **Run the development server:**
    ```bash
    npm run dev
    ```
-3. **Build for production**:
-   ```bash
-   npm run build
-   ```
+4. **Open in browser:**
+   Navigate to `http://localhost:5173`.
 
-## Contributing
+## 🔒 Security & Isolation
+The application implements Cross-Origin Opener Policy (COOP) and Cross-Origin Embedder Policy (COEP) headers to enable `SharedArrayBuffer`, which is required by the LibreOffice WASM engine for high-performance, multi-threaded document processing.
 
-Contributions are welcome! Please open an issue or submit a pull request.
+## 📄 License
+MIT License.
