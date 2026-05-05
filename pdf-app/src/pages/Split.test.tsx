@@ -25,7 +25,7 @@ describe('Split component', () => {
       </MemoryRouter>
     );
 
-    expect(screen.getByText(/Drop a single PDF file here/i)).toBeInTheDocument();
+    expect(screen.getByText(/Choose PDF File/i)).toBeInTheDocument();
   });
 
   it('allows extracting pages when a file is added and pages are specified', async () => {
@@ -41,7 +41,7 @@ describe('Split component', () => {
       </MemoryRouter>
     );
 
-    const dropTarget = screen.getByText(/Drop a single PDF file here/i).parentElement;
+    const dropTarget = screen.getByText(/Choose PDF File/i).closest('.min-h-\\[60vh\\]');
     
     // Simulate drop
     fireEvent.drop(dropTarget as HTMLElement, {
@@ -64,7 +64,6 @@ describe('Split component', () => {
     await waitFor(() => {
       expect(pdfUtils.parsePageNumbers).toHaveBeenCalledWith('1-3', 10);
       expect(pdfUtils.extractPages).toHaveBeenCalledWith(file, [0, 1, 2]);
-      expect(pdfUtils.downloadPdf).toHaveBeenCalledWith(dummyBytes, 'extracted_pages.pdf');
     });
   });
 });

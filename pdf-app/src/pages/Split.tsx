@@ -2,14 +2,16 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, SplitSquareHorizontal, File } from 'lucide-react';
 import { Dropzone } from '../components/Dropzone';
-import { extractPages, parsePageNumbers, downloadPdf, getPdfPageCount } from '../lib/pdf-utils';
+import { extractPages, parsePageNumbers, getPdfPageCount } from '../lib/pdf-utils';
+import { SuccessScreen } from '../components/SuccessScreen';
+import { ProcessingOverlay } from '../components/ProcessingOverlay';
 
 export function Split() {
   const [file, setFile] = useState<File | null>(null);
   const [pageCount, setPageCount] = useState(0);
   const [pageInput, setPageInput] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const [resultBlob, setResultBlob] = useState<Blob | null>(null);
 
   const handleFilesDrop = async (droppedFiles: File[]) => {
     if (droppedFiles.length > 0) {
@@ -34,79 +36,99 @@ export function Split() {
     }
 
     setIsProcessing(true);
-    setProgress(50);
     try {
       const extractedBytes = await extractPages(file, pagesToExtract);
-      setProgress(100);
-      downloadPdf(extractedBytes, 'extracted_pages.pdf');
+      setResultBlob(new Blob([extractedBytes as any], { type: 'application/pdf' }));
     } catch (e) {
       console.error(e);
       alert('Failed to extract pages');
     } finally {
-      setTimeout(() => { setIsProcessing(false); setProgress(0); }, 1000);
+      setIsProcessing(false);
     }
   };
 
+  const handleDownload = () => {
+    if (!resultBlob) return;
+    const url = URL.createObjectURL(resultBlob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'extracted_pages.pdf';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  if (resultBlob) {
+    return <SuccessScreen onDownload={handleDownload} onRestart={() => { setFile(null); setPageInput(''); setResultBlob(null); }} />;
+  }
+
   return (
-    <div className="animate-in fade-in duration-300">
+    <div className="animate-in fade-in duration-300 max-w-4xl mx-auto py-10">
+      <ProcessingOverlay isConverting={isProcessing} message="Extracting pages..." />
+      
       <Link to="/" className="inline-flex items-center text-sm font-medium text-steel hover:text-ink mb-8">
         <ArrowLeft size={16} className="mr-2" /> Back to tools
       </Link>
       
-      <h1 className="text-3xl font-semibold mb-2">Split PDF</h1>
-      <p className="text-steel mb-8">Extract specific pages from a document.</p>
+      <h1 className="text-4xl font-bold mb-2 text-center">Split PDF</h1>
+      <p className="text-steel mb-10 text-center">Extract specific pages from a document.</p>
 
-      <Dropzone onFilesSelect={handleFilesDrop} multiple={false}>
-        {!file ? (
-          <div className="flex-1 flex flex-col items-center justify-center text-steel pointer-events-none">
-            <SplitSquareHorizontal size={64} strokeWidth={1} className="mb-4" />
-            <p className="mb-8">Drop a single PDF file here</p>
-            <label 
-              htmlFor="pdf-upload-input" 
-              className="bg-surface text-ink border border-hairline px-6 py-2 rounded-full font-medium hover:bg-hairline transition-colors cursor-pointer pointer-events-auto"
+      {!file ? (
+        <Dropzone onFilesSelect={handleFilesDrop} multiple={false} accept="application/pdf">
+          <div className="flex-1 flex flex-col items-center justify-center border-2 border-dashed border-hairline rounded-[32px] p-10 hover:border-brand-purple transition-colors">
+            <div className="w-20 h-20 bg-brand-purple/10 rounded-2xl flex items-center justify-center mb-6">
+              <SplitSquareHorizontal size={40} className="text-brand-purple" />
+            </div>
+            <h2 className="text-2xl font-bold mb-2">Choose PDF File</h2>
+            <p className="text-gray-400">or drop a PDF file here</p>
+          </div>
+        </Dropzone>
+      ) : (
+        <div className="bg-surface p-8 rounded-[32px] border border-hairline">
+          <div className="flex items-center gap-4 mb-10">
+            <div className="w-12 h-12 bg-white rounded-lg border border-hairline flex items-center justify-center shadow-sm">
+              <File size={24} className="text-brand-purple" />
+            </div>
+            <div>
+              <p className="font-bold text-lg">{file.name}</p>
+              <p className="text-sm text-steel font-medium">{pageCount} pages total</p>
+            </div>
+            <button 
+              onClick={() => setFile(null)} 
+              className="ml-auto text-brand-purple font-bold hover:underline text-sm"
             >
-              Or Select Files
-            </label>
+              Change File
+            </button>
           </div>
-        ) : (
-          <div className="flex-1 p-6 bg-canvas border border-hairline rounded-xl">
-            <div className="flex items-center gap-4 mb-8">
-              <File size={32} className="text-steel" />
-              <div>
-                <p className="font-semibold">{file.name}</p>
-                <p className="text-sm text-steel">{pageCount} pages total</p>
-              </div>
-            </div>
 
-            <div className="mb-8">
-              <label className="block text-sm font-semibold mb-2">Pages to extract</label>
-              <input 
-                type="text" 
-                placeholder="e.g., 1, 3, 5-8" 
-                value={pageInput}
-                onChange={(e) => setPageInput(e.target.value)}
-                className="w-full bg-canvas text-ink border border-hairline rounded-md px-4 py-2 focus:outline-none focus:border-ink transition-colors"
-              />
-              <p className="text-xs text-steel mt-2">Comma separated page numbers or ranges.</p>
-            </div>
-            
-            <div className="flex flex-col items-end">
-              {isProcessing && (
-                <div className="w-full bg-surface h-2 rounded-full mb-4 overflow-hidden">
-                  <div className="bg-ink h-full transition-all duration-300" style={{ width: `${progress}%` }}></div>
-                </div>
-              )}
-              <button 
-                onClick={handleSplit}
-                disabled={isProcessing || !pageInput.trim()}
-                className="bg-ink text-white px-6 py-3 rounded-full font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-black transition-colors"
-              >
-                {isProcessing ? 'Processing...' : 'Extract Pages'}
-              </button>
-            </div>
+          <div className="mb-10">
+            <label className="block text-sm font-bold text-steel uppercase tracking-wider mb-3">Pages to extract</label>
+            <input 
+              type="text" 
+              placeholder="e.g., 1, 3, 5-8" 
+              value={pageInput}
+              onChange={(e) => setPageInput(e.target.value)}
+              className="w-full bg-white text-ink border border-hairline rounded-xl px-6 py-4 text-lg focus:outline-none focus:border-brand-purple focus:ring-4 focus:ring-brand-purple/10 transition-all shadow-sm"
+            />
+            <p className="text-sm text-steel mt-3 font-medium">Comma separated page numbers or ranges.</p>
           </div>
-        )}
-      </Dropzone>
+          
+          <div className="flex justify-center">
+            <button 
+              onClick={handleSplit}
+              disabled={isProcessing || !pageInput.trim()}
+              className="button-primary px-12 text-lg"
+            >
+              Extract Pages
+            </button>
+          </div>
+          <button 
+            onClick={() => setFile(null)}
+            className="block w-full mt-4 text-gray-400 hover:text-ink transition-colors text-sm font-medium"
+          >
+            Clear selection
+          </button>
+        </div>
+      )}
     </div>
   );
 }

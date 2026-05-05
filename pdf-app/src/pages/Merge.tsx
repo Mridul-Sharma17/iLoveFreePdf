@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Layers, GripVertical, X } from 'lucide-react';
 import { Dropzone } from '../components/Dropzone';
-import { mergePdfs, downloadPdf } from '../lib/pdf-utils';
+import { mergePdfs } from '../lib/pdf-utils';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { SuccessScreen } from '../components/SuccessScreen';
+import { ProcessingOverlay } from '../components/ProcessingOverlay';
 
 function SortableItem({ id, file, onRemove }: { id: string, file: File, onRemove: (id: string) => void }) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
@@ -29,7 +31,7 @@ function SortableItem({ id, file, onRemove }: { id: string, file: File, onRemove
 export function Merge() {
   const [files, setFiles] = useState<{id: string, file: File}[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const [resultBlob, setResultBlob] = useState<Blob | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -59,67 +61,101 @@ export function Merge() {
   const handleMerge = async () => {
     if (files.length < 2) return;
     setIsProcessing(true);
-    setProgress(50);
     try {
       const mergedBytes = await mergePdfs(files.map(f => f.file));
-      setProgress(100);
-      downloadPdf(mergedBytes, 'merged_result.pdf');
+      setResultBlob(new Blob([mergedBytes as any], { type: 'application/pdf' }));
     } catch (e) {
       console.error(e);
       alert('Failed to merge PDFs');
     } finally {
-      setTimeout(() => { setIsProcessing(false); setProgress(0); }, 1000);
+      setIsProcessing(false);
     }
   };
 
+  const handleDownload = () => {
+    if (!resultBlob) return;
+    const url = URL.createObjectURL(resultBlob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'merged_result.pdf';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  if (resultBlob) {
+    return <SuccessScreen onDownload={handleDownload} onRestart={() => { setFiles([]); setResultBlob(null); }} />;
+  }
+
   return (
-    <div className="animate-in fade-in duration-300">
+    <div className="animate-in fade-in duration-300 max-w-4xl mx-auto py-10">
+      <ProcessingOverlay isConverting={isProcessing} message="Merging PDFs..." />
+      
       <Link to="/" className="inline-flex items-center text-sm font-medium text-steel hover:text-ink mb-8">
         <ArrowLeft size={16} className="mr-2" /> Back to tools
       </Link>
       
-      <h1 className="text-3xl font-semibold mb-2">Merge PDFs</h1>
-      <p className="text-steel mb-8">Drag and drop multiple PDFs and reorder them before merging.</p>
+      <h1 className="text-4xl font-bold mb-2 text-center">Merge PDF</h1>
+      <p className="text-steel mb-10 text-center">Drag and drop multiple PDFs and reorder them before merging.</p>
 
-      <Dropzone onFilesSelect={handleFilesDrop} multiple>
-        {files.length === 0 ? (
-          <div className="flex-1 flex flex-col items-center justify-center text-steel pointer-events-none">
-            <Layers size={64} strokeWidth={1} className="mb-4" />
-            <p className="mb-8">Drop PDF files here to begin</p>
-            <label 
-              htmlFor="pdf-upload-input" 
-              className="bg-surface text-ink border border-hairline px-6 py-2 rounded-full font-medium hover:bg-hairline transition-colors cursor-pointer pointer-events-auto"
-            >
-              Or Select Files
-            </label>
+      {files.length === 0 ? (
+        <Dropzone onFilesSelect={handleFilesDrop} multiple accept="application/pdf">
+          <div className="flex-1 flex flex-col items-center justify-center border-2 border-dashed border-hairline rounded-[32px] p-10 hover:border-brand-purple transition-colors">
+            <div className="w-20 h-20 bg-brand-purple/10 rounded-2xl flex items-center justify-center mb-6">
+              <Layers size={40} className="text-brand-purple" />
+            </div>
+            <h2 className="text-2xl font-bold mb-2">Choose PDF Files</h2>
+            <p className="text-gray-400">or drop PDF files here</p>
           </div>
-        ) : (
-          <div className="flex-1">
-            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-              <SortableContext items={files.map(f => f.id)} strategy={verticalListSortingStrategy}>
+        </Dropzone>
+      ) : (
+        <div className="bg-surface p-8 rounded-[32px] border border-hairline">
+          <div className="mb-6 flex justify-between items-center">
+            <span className="text-sm font-bold text-steel uppercase tracking-wider">{files.length} Files selected</span>
+            <button 
+              onClick={() => {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'application/pdf';
+                input.multiple = true;
+                input.onchange = (e) => {
+                  const files = (e.target as HTMLInputElement).files;
+                  if (files) handleFilesDrop(Array.from(files));
+                };
+                input.click();
+              }}
+              className="text-brand-purple font-bold hover:underline"
+            >
+              + Add More
+            </button>
+          </div>
+
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <SortableContext items={files.map(f => f.id)} strategy={verticalListSortingStrategy}>
+              <div className="grid grid-cols-1 gap-2">
                 {files.map((fileObj) => (
                   <SortableItem key={fileObj.id} id={fileObj.id} file={fileObj.file} onRemove={removeFile} />
                 ))}
-              </SortableContext>
-            </DndContext>
-            
-            <div className="mt-8 flex flex-col items-end">
-              {isProcessing && (
-                <div className="w-full bg-surface h-2 rounded-full mb-4 overflow-hidden">
-                  <div className="bg-ink h-full transition-all duration-300" style={{ width: `${progress}%` }}></div>
-                </div>
-              )}
-              <button 
-                onClick={handleMerge}
-                disabled={files.length < 2 || isProcessing}
-                className="bg-ink text-white px-6 py-3 rounded-full font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-black transition-colors"
-              >
-                {isProcessing ? 'Merging...' : 'Merge PDFs'}
-              </button>
-            </div>
+              </div>
+            </SortableContext>
+          </DndContext>
+          
+          <div className="mt-12 flex justify-center">
+            <button 
+              onClick={handleMerge}
+              disabled={files.length < 2 || isProcessing}
+              className="button-primary px-12 text-lg"
+            >
+              Merge PDFs
+            </button>
           </div>
-        )}
-      </Dropzone>
+          <button 
+            onClick={() => setFiles([])}
+            className="block w-full mt-4 text-gray-400 hover:text-ink transition-colors text-sm font-medium"
+          >
+            Clear selection
+          </button>
+        </div>
+      )}
     </div>
   );
 }

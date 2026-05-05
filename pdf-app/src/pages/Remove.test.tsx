@@ -25,7 +25,7 @@ describe('Remove component', () => {
       </MemoryRouter>
     );
 
-    expect(screen.getByText(/Drop a single PDF file here/i)).toBeInTheDocument();
+    expect(screen.getByText(/Choose PDF File/i)).toBeInTheDocument();
   });
 
   it('allows removing pages when a file is added and pages are specified', async () => {
@@ -41,7 +41,7 @@ describe('Remove component', () => {
       </MemoryRouter>
     );
 
-    const dropTarget = screen.getByText(/Drop a single PDF file here/i).parentElement;
+    const dropTarget = screen.getByText(/Choose PDF File/i).closest('.min-h-\\[60vh\\]');
     
     // Simulate drop
     fireEvent.drop(dropTarget as HTMLElement, {
@@ -64,7 +64,6 @@ describe('Remove component', () => {
     await waitFor(() => {
       expect(pdfUtils.parsePageNumbers).toHaveBeenCalledWith('5-6', 10);
       expect(pdfUtils.removePages).toHaveBeenCalledWith(file, [4, 5]);
-      expect(pdfUtils.downloadPdf).toHaveBeenCalledWith(dummyBytes, 'cleaned_document.pdf');
     });
   });
 });

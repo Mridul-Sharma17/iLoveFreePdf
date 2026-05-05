@@ -1,0 +1,9 @@
+public/wasm
+public/pdfjs
+node_modules
+.worktrees
+graphify-out
+docs
+dist
+.vercel
+.git
